@@ -1,0 +1,194 @@
+# ============================================================
+# Dependencies
+# ============================================================
+
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# pnpm
+.pnpm-store/
+
+# ============================================================
+# Build output
+# ============================================================
+
+# Next.js
+.next/
+out/
+
+# NestJS / TypeScript
+dist/
+build/
+
+# Turborepo
+.turbo/
+
+# Nx
+.nx/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# ============================================================
+# Testing / coverage
+# ============================================================
+
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+
+# Jest
+jest-cache/
+
+# ============================================================
+# Environment files
+# ============================================================
+
+.env
+.env.local
+.env.*.local
+
+# Keep example/template env files
+!.env.example
+!.env.sample
+!.env.template
+
+# ============================================================
+# Logs
+# ============================================================
+
+logs/
+*.log
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============================================================
+# Runtime / temporary files
+# ============================================================
+
+tmp/
+temp/
+.cache/
+
+*.pid
+*.pid.lock
+*.seed
+
+# ============================================================
+# Uploads / local application data
+# ============================================================
+
+uploads/
+storage/
+
+# ============================================================
+# Databases / local services
+# ============================================================
+
+*.sqlite
+*.sqlite3
+*.db
+
+# ============================================================
+# OS
+# ============================================================
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ============================================================
+# Editors / IDEs
+# ============================================================
+
+.idea/
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Cursor
+# ============================================================
+
+# Keep shared project rules
+!.cursor/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+
+# Ignore Cursor-local state/config if generated
+.cursor/index/
+.cursor/cache/
+
+# ============================================================
+# Claude Code
+# ============================================================
+
+# Keep CLAUDE.md committed.
+# Ignore machine/user-specific Claude state.
+.claude/*
+!.claude/commands/
+!.claude/commands/**
+
+# Local Claude settings
+.claude/settings.local.json
+
+# ============================================================
+# OpenAI Codex
+# ============================================================
+
+# Keep AGENTS.md committed.
+# Ignore local Codex state/config if created inside the repo.
+.codex/
+
+# ============================================================
+# Misc AI tooling
+# ============================================================
+
+.aider*
+.aider.chat.history.md
+.aider.input.history
+
+# ============================================================
+# Package manager / tooling caches
+# ============================================================
+
+.eslintcache
+.stylelintcache
+
+# ============================================================
+# Certificates / secrets
+# ============================================================
+
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ============================================================
+# Misc
+# ============================================================
+
+.vercel/
