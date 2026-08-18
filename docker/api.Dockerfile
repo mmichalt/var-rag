@@ -30,6 +30,7 @@ COPY --from=build --chown=appuser:appuser /app/libs/config/dist ./libs/config/di
 COPY --from=build --chown=appuser:appuser /app/libs/config/package.json ./libs/config/package.json
 COPY --from=build --chown=appuser:appuser /app/libs/database/dist ./libs/database/dist
 COPY --from=build --chown=appuser:appuser /app/libs/database/package.json ./libs/database/package.json
+COPY --from=build --chown=appuser:appuser /app/libs/database/node_modules ./libs/database/node_modules
 COPY --from=build --chown=appuser:appuser /app/libs/database/prisma ./libs/database/prisma
 COPY --from=build --chown=appuser:appuser /app/libs/database/prisma.config.ts ./libs/database/prisma.config.ts
 COPY --from=build --chown=appuser:appuser /app/package.json ./package.json

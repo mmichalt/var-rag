@@ -28,7 +28,8 @@ if (process.argv.includes('--revert')) {
     'Database already has objects. Baselining the initial Prisma pgvector migration.\n',
   );
 
-  // Existing non-empty DB (previous TypeORM migrate). Apply the SQL, then record it.
+  // Existing non-empty DB (previous TypeORM migrate). Apply the SQL, record it,
+  // then deploy any later migrations that were blocked by P3005.
   const sqlFile = resolve(
     packageRoot,
     'prisma/migrations',
@@ -39,9 +40,16 @@ if (process.argv.includes('--revert')) {
   if (executed.status !== 0) {
     process.exit(executed.status);
   }
-  process.exit(
-    runPrisma(['migrate', 'resolve', '--applied', INITIAL_MIGRATION]).status,
-  );
+  const resolved = runPrisma([
+    'migrate',
+    'resolve',
+    '--applied',
+    INITIAL_MIGRATION,
+  ]);
+  if (resolved.status !== 0) {
+    process.exit(resolved.status);
+  }
+  process.exit(runPrisma(['migrate', 'deploy']).status);
 }
 
 function runPrisma(args: string[]): { status: number; output: string } {
