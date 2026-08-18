@@ -1,0 +1,26 @@
+packages:
+  - apps/*
+  - libs/*
+
+onlyBuiltDependencies:
+  - nx
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - esbuild
+  - less
+  - msgpackr-extract
+  - sharp
+  - unrs-resolver
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  less: true
+  nx: true
+  sharp: true
+  unrs-resolver: true
+  '@nestjs/core': true
+  '@scarf/scarf': true
+  msgpackr-extract: true

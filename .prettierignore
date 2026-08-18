@@ -1,0 +1,13 @@
+# Add files here to ignore them from prettier formatting
+/dist
+**/dist
+**/.next
+/coverage
+**/coverage
+**/test-output
+/.nx
+/node_modules
+**/out-tsc
+pnpm-lock.yaml
+.corepack
+.tools

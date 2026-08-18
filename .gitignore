@@ -17,6 +17,8 @@ node_modules/
 
 # pnpm
 .pnpm-store/
+.corepack/
+.tools/
 
 # ============================================================
 # Build output
@@ -36,8 +38,9 @@ build/
 # Nx
 .nx/
 
-# TypeScript incremental build info
-*.tsbuildinfo
+out-tsc/
+**/out-tsc/
+test-output/
 
 # ============================================================
 # Testing / coverage
@@ -192,3 +195,13 @@ Desktop.ini
 # ============================================================
 
 .vercel/
+
+
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
+
+# Next.js
+.next
+out
+test-output

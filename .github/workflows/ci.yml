@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services: {}
+    env:
+      NODE_ENV: test
+      API_PORT: 3001
+      DATABASE_URL: postgresql://football_rag:football_rag_dev@localhost:5432/football_rag
+      REDIS_URL: redis://localhost:6379
+      CORS_ORIGINS: http://localhost:3000
+      LOG_LEVEL: error
+      SWAGGER_ENABLED: 'false'
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001/api/v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Enable Corepack
+        run: corepack enable && corepack prepare pnpm@11.22.0 --activate
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Validate Compose file
+        run: docker compose config
+      - name: Start PostgreSQL and Redis
+        run: docker compose up -d --wait
+      - name: Run migrations
+        run: pnpm db:migrate
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Build application images
+        run: |
+          docker build -f docker/api.Dockerfile -t football-rag-api:ci .
+          docker build -f docker/worker.Dockerfile -t football-rag-worker:ci .
+          docker build -f docker/web.Dockerfile -t football-rag-web:ci .
+      - name: Stop infrastructure
+        if: always()
+        run: docker compose down -v
