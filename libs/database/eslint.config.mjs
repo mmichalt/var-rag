@@ -9,6 +9,7 @@ export default [
         'error',
         {
           ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}'],
+          ignoredDependencies: ['@prisma/client'],
         },
       ],
     },
@@ -17,6 +18,6 @@ export default [
     },
   },
   {
-    ignores: ['**/out-tsc'],
+    ignores: ['**/out-tsc', '**/src/generated/**'],
   },
 ];

@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { getDataSourceToken } from '@nestjs/typeorm';
 import type { BackendConfig } from '@var-rag/config';
+import { PrismaService } from '@var-rag/database';
 import request from 'supertest';
 import { configureHttpApp } from '../http';
 import { HealthController } from './health.controller';
@@ -26,8 +26,10 @@ describe('HealthController', () => {
       controllers: [HealthController],
       providers: [
         {
-          provide: getDataSourceToken(),
-          useValue: { query: jest.fn().mockResolvedValue([{ '?column?': 1 }]) },
+          provide: PrismaService,
+          useValue: {
+            $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
+          },
         },
         {
           provide: REDIS_CLIENT,

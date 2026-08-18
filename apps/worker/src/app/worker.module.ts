@@ -7,11 +7,9 @@ import {
   type OnModuleInit,
 } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { loadBackendConfig, redisConnectionOptions } from '@var-rag/config';
-import { DatabaseModule } from '@var-rag/database';
+import { DatabaseModule, PrismaService } from '@var-rag/database';
 import Redis from 'ioredis';
-import type { DataSource } from 'typeorm';
 
 const REDIS_CLIENT = Symbol('REDIS_CLIENT');
 const config = loadBackendConfig();
@@ -21,12 +19,12 @@ class WorkerRuntime implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger('worker');
 
   constructor(
-    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly prisma: PrismaService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.dataSource.query('SELECT 1');
+    await this.prisma.$queryRaw`SELECT 1`;
     await this.redis.ping();
     this.logger.log({
       msg: 'Worker started',

@@ -32,6 +32,9 @@ out/
 dist/
 build/
 
+# Prisma Client (generated)
+libs/database/src/generated/
+
 # Turborepo
 .turbo/
 

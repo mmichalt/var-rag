@@ -1,17 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { loadBackendConfig } from '@var-rag/config';
-import { createDataSourceOptions } from './typeorm-options.js';
+import { PrismaService } from './prisma.service.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        ...createDataSourceOptions(loadBackendConfig()),
-        autoLoadEntities: true,
-      }),
-    }),
-  ],
-  exports: [TypeOrmModule],
+  providers: [PrismaService],
+  exports: [PrismaService],
 })
 export class DatabaseModule {}

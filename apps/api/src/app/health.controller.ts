@@ -5,16 +5,15 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { InjectDataSource } from '@nestjs/typeorm';
+import { PrismaService } from '@var-rag/database';
 import type { Redis } from 'ioredis';
-import type { DataSource } from 'typeorm';
 import { REDIS_CLIENT } from './tokens';
 
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
   constructor(
-    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly prisma: PrismaService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
@@ -33,7 +32,7 @@ export class HealthController {
     };
 
     try {
-      await this.dataSource.query('SELECT 1');
+      await this.prisma.$queryRaw`SELECT 1`;
       details.postgres = { status: 'up' };
     } catch {
       details.postgres = { status: 'down' };

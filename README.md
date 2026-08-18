@@ -82,18 +82,21 @@ The app profile uses `postgres:5432`, `redis:6379`, and `api:3001` on the Compos
 
 ## Migrations
 
-Schema changes go through TypeORM. `synchronize` is always `false`.
+Schema changes go through Prisma. The schema lives in `libs/database/prisma/schema.prisma`. Do not use `prisma db push` against a shared database.
 
 ```bash
 pnpm db:migrate
-pnpm db:migration:create -- libs/database/src/lib/migrations/AddSomething
-pnpm db:migration:generate -- libs/database/src/lib/migrations/AddSomething
-pnpm db:migration:revert
+pnpm db:migration:create -- --name add_something
+pnpm db:migration:generate -- --name add_something
 ```
 
-The initial migration enables `pgvector` with `CREATE EXTENSION IF NOT EXISTS vector`. Reverting it drops the extension and is only safe on an empty development database.
+`pnpm db:migrate` builds `database` (which generates Prisma Client) and runs `prisma migrate deploy`. Production containers use that compiled entrypoint, not TypeScript source paths. The API image must include `libs/database/prisma` and `libs/database/prisma.config.ts`.
 
-`pnpm db:migrate` builds `config` and `database`, then runs compiled JavaScript. Production containers must use that compiled entrypoint, not TypeScript source paths.
+`create` writes an empty SQL migration. `generate` diffs the Prisma schema and applies the result locally. Prisma migrations are forward-only: undo a change by adding a new migration with the reverse SQL.
+
+The initial migration enables `pgvector` with `CREATE EXTENSION IF NOT EXISTS vector`. If a local database already applied the previous TypeORM migration, `pnpm db:migrate` records that SQL in `_prisma_migrations` instead of failing on a non-empty schema.
+
+Prisma Client is generated into `libs/database/src/generated` and is not committed. Build and typecheck targets generate it first.
 
 ## Quality
 

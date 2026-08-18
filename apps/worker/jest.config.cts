@@ -14,7 +14,14 @@ module.exports = {
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
+    '^.+\\.mjs$': [
+      '@swc/jest',
+      {
+        jsc: { parser: { syntax: 'ecmascript' } },
+        module: { type: 'commonjs' },
+      },
+    ],
   },
-  moduleFileExtensions: ['ts', 'js', 'html'],
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'html'],
   coverageDirectory: 'test-output/jest/coverage',
 };

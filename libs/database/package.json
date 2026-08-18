@@ -20,15 +20,50 @@
     "tags": [
       "type:lib",
       "scope:backend"
-    ]
+    ],
+    "targets": {
+      "prisma-generate": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/prisma/schema.prisma",
+          "{projectRoot}/prisma.config.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/src/generated/prisma"
+        ],
+        "options": {
+          "command": "pnpm exec prisma generate --config prisma.config.ts",
+          "cwd": "libs/database"
+        }
+      },
+      "build": {
+        "dependsOn": [
+          "prisma-generate",
+          "^build"
+        ]
+      },
+      "typecheck": {
+        "dependsOn": [
+          "prisma-generate",
+          "^typecheck"
+        ]
+      },
+      "lint": {
+        "dependsOn": [
+          "prisma-generate"
+        ]
+      }
+    }
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
-    "@nestjs/typeorm": "^11.0.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
     "@var-rag/config": "workspace:*",
     "pg": "^8.16.3",
-    "tslib": "^2.3.0",
-    "typeorm": "^1.1.0"
+    "prisma": "^7.9.1",
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@types/pg": "^8.21.0"
