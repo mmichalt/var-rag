@@ -8,18 +8,10 @@ import { RRF_K, VISIBILITY_SQL } from '../versions.js';
 import { rrfFuse } from './rrf.js';
 
 export function passesRelevanceCutoff(
-  chunk: {
-    lexicalRank: number | null;
-    cosineDistance: number | null;
-  },
+  cosineDistance: number | null,
   maxCosineDistance: number,
 ): boolean {
-  if (chunk.lexicalRank !== null) {
-    return true;
-  }
-  return (
-    chunk.cosineDistance !== null && chunk.cosineDistance <= maxCosineDistance
-  );
+  return cosineDistance !== null && cosineDistance <= maxCosineDistance;
 }
 
 export type RetrievalFilters = {
@@ -178,10 +170,7 @@ export async function retrieveHybrid(
   )
     .filter((hit) =>
       passesRelevanceCutoff(
-        {
-          lexicalRank: hit.lexicalRank,
-          cosineDistance: semanticDistance.get(hit.id) ?? null,
-        },
+        semanticDistance.get(hit.id) ?? null,
         input.config.retrievalMaxCosineDistance,
       ),
     )

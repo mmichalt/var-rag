@@ -134,7 +134,7 @@ describeSlice('Ask the Laws slice', () => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/ask')
       .send({
-        query: 'Who won the 2025 Premier League title?',
+        query: 'How many tablespoons of baking powder go in a chocolate cake?',
         mode: 'laws',
         edition: '2025/26',
       });

@@ -252,8 +252,8 @@ One backend library tagged `type:lib, scope:backend` so the existing `@nx/enforc
 resolve edition -> embed query -> SEMANTIC_CANDIDATE_K by cosine distance
                               -> LEXICAL_CANDIDATE_K by websearch_to_tsquery
                               -> RRF fusion with RRF_K
-                              -> drop hits with no lexical support and cosine
-                                 distance above RETRIEVAL_MAX_COSINE_DISTANCE
+                              -> drop hits whose cosine distance is above
+                                 RETRIEVAL_MAX_COSINE_DISTANCE
                               -> cut to RETRIEVAL_TOP_K
 ```
 
