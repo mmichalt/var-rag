@@ -1,0 +1,30 @@
+packages:
+  - apps/*
+  - libs/*
+
+onlyBuiltDependencies:
+  - nx
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - esbuild
+  - less
+  - msgpackr-extract
+  - prisma
+  - sharp
+  - unrs-resolver
+
+allowBuilds:
+  '@nestjs/core': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
+  '@swc/core': true
+  less: true
+  msgpackr-extract: true
+  nx: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true

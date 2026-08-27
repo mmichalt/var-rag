@@ -1,0 +1,14 @@
+// Domain models are added with their own migrations.
+// pgvector is enabled by the initial SQL migration, not by schema models.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
