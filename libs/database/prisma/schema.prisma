@@ -1,5 +1,6 @@
-// Domain models are added with their own migrations.
-// pgvector is enabled by the initial SQL migration, not by schema models.
+// Domain models for the Ask the Laws vertical slice.
+// pgvector is enabled by the initial SQL migration.
+// searchVector is a generated tsvector; the GIN index is hand-written SQL.
 
 generator client {
   provider            = "prisma-client"
@@ -11,4 +12,191 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum RightsStatus {
+  NOT_ASSESSED
+  APPROVED
+  REJECTED
+}
+
+enum UsageStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DocumentStatus {
+  STAGED
+  PUBLISHED
+  RETIRED
+}
+
+enum DuplicateFlagStatus {
+  NONE
+  LIKELY_DUPLICATE
+}
+
+enum ChunkSetStatus {
+  BUILDING
+  READY
+  ACTIVE
+  SUPERSEDED
+  FAILED
+}
+
+enum EvidenceLabel {
+  OFFICIAL_LAW
+  OFFICIAL_DECISION
+  OFFICIAL_EXPLANATION
+}
+
+enum ActorTrust {
+  UNAUTHENTICATED
+  AUTHENTICATED
+}
+
+enum AskOutcome {
+  ANSWER
+  CLARIFICATION
+  INSUFFICIENT_EVIDENCE
+}
+
+model SourceFamily {
+  id              String       @id @default(cuid())
+  name            String       @unique
+  owner           String
+  urlPattern      String
+  authorityLevel  String
+  rightsStatus    RightsStatus
+  usageBasis      String
+  displayPolicy   String
+  maxExcerptChars Int
+  approvedBy      String?
+  approvedAt      DateTime?
+  usageStatus     UsageStatus  @default(ACTIVE)
+  lastIngestedAt  DateTime?
+  documents       SourceDocument[]
+}
+
+model SourceDocument {
+  id                   String              @id @default(cuid())
+  familyId             String
+  family               SourceFamily        @relation(fields: [familyId], references: [id])
+  canonicalUrl         String
+  title                String
+  edition              String?
+  effectiveFrom        DateTime?
+  effectiveTo          DateTime?
+  publishedDate        DateTime?
+  retrievedAt          DateTime
+  mediaType            String
+  contentSha256        String
+  normalizedTextSha256 String?
+  duplicateFlagStatus  DuplicateFlagStatus @default(NONE)
+  rawContent           Bytes
+  extractedText        String?
+  extractionReport     Json?
+  extractionGatePassed Boolean             @default(false)
+  status               DocumentStatus      @default(STAGED)
+  version              Int
+  supersedesId         String?             @unique
+  supersedes           SourceDocument?     @relation("DocumentVersions", fields: [supersedesId], references: [id])
+  supersededBy         SourceDocument?     @relation("DocumentVersions")
+  activeChunkSetId     String?             @unique
+  activeChunkSet       ChunkSet?           @relation("ActiveChunkSet", fields: [activeChunkSetId], references: [id])
+  chunkSets            ChunkSet[]          @relation("DocumentChunkSets")
+  chunks               Chunk[]
+  createdAt            DateTime            @default(now())
+
+  @@unique([familyId, contentSha256])
+  @@index([familyId, status])
+  @@index([status, edition])
+}
+
+model ChunkSet {
+  id                   String         @id @default(cuid())
+  documentId           String
+  document             SourceDocument @relation("DocumentChunkSets", fields: [documentId], references: [id])
+  chunkingVersion      String
+  normalizationVersion String
+  embeddingModel       String
+  embeddingDigest      String
+  embeddingDimensions  Int
+  status               ChunkSetStatus
+  expectedChunkCount   Int
+  chunkCount           Int            @default(0)
+  createdAt            DateTime       @default(now())
+  activatedAt          DateTime?
+  chunks               Chunk[]
+  activeFor            SourceDocument? @relation("ActiveChunkSet")
+}
+
+model Chunk {
+  id            String         @id @default(cuid())
+  chunkSetId    String
+  chunkSet      ChunkSet       @relation(fields: [chunkSetId], references: [id])
+  documentId    String
+  document      SourceDocument @relation(fields: [documentId], references: [id])
+  ordinal       Int
+  sourceText    String
+  retrievalText String
+  locator       Json
+  evidenceLabel EvidenceLabel
+  tokenCount    Int
+  embedding     Unsupported("vector(768)")?
+  searchVector  Unsupported("tsvector")?
+
+  @@unique([chunkSetId, ordinal])
+  @@index([chunkSetId])
+  @@index([documentId])
+}
+
+model CorpusRevision {
+  revision    Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  reason      String
+  fingerprint String
+  indexConfig Json
+}
+
+model AuditEvent {
+  id         String     @id @default(cuid())
+  actor      String
+  actorTrust ActorTrust
+  action     String
+  targetType String
+  targetId   String
+  before     Json?
+  after      Json?
+  at         DateTime   @default(now())
+}
+
+model AnswerLog {
+  id                String     @id @default(cuid())
+  createdAt         DateTime   @default(now())
+  requestId         String
+  query             String
+  mode              String
+  requestedFilters  Json
+  resolvedEdition   String?
+  resolutionReason  String?
+  retrievalConfig   Json
+  evidenceSnapshot  Json
+  corpusRevision    Int?
+  corpusFingerprint String?
+  llmModel          String
+  llmDigest         String
+  llmOptions        Json
+  embeddingModel    String
+  embeddingDigest   String
+  promptVersion     String
+  policyVersion     String
+  retrievalVersion  String
+  chunkingVersion   String
+  outcome           AskOutcome
+  policyRejections  Json
+  timings           Json
+
+  @@index([createdAt])
+  @@index([requestId])
 }

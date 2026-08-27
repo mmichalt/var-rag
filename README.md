@@ -13,7 +13,7 @@ This repository is a pnpm/Nx monorepo:
 | Redis                 | BullMQ job backend                          |
 | MinIO                 | Optional local S3-compatible object storage |
 
-The API does not run ingestion or indexing synchronously. Those jobs belong on the worker.
+The API does not run ingestion or indexing synchronously. Those jobs belong on the worker. Privileged corpus commands are CLI-only (no HTTP ingest/publish endpoints).
 
 ## Prerequisites
 
@@ -72,6 +72,12 @@ Optional object storage (creates bucket `football-rag-sources`):
 docker compose --profile object-storage up -d
 ```
 
+Local Ollama (not used by CI):
+
+```bash
+docker compose --profile models up -d
+```
+
 Full container stack:
 
 ```bash
@@ -109,4 +115,39 @@ pnpm test
 pnpm build
 ```
 
-Integration checks for API readiness and worker startup run when `DATABASE_URL` and `REDIS_URL` are set.
+Integration checks for API readiness, worker startup, and the Ask the Laws slice run in CI when `DATABASE_URL` and `REDIS_URL` are set. Local `pnpm test` skips them so a missing database does not fail unit tests.
+
+## Ask the Laws
+
+The first product slice answers association-football law questions from a **synthetic two-edition corpus**. Real IFAB text is not ingested; `docs/corpus.md` records the rights finding.
+
+```bash
+pnpm corpus:ingest -- --file data/synthetic-lawbook-2025-26.pdf --family synthetic-lawbook --edition 2025/26 --url https://example.invalid/lawbook/2025-26 --fake-embedder
+pnpm corpus:inspect -- --document <id>
+pnpm corpus:publish -- --document <id> --fake-embedder
+pnpm corpus:reindex -- --fake-embedder
+pnpm corpus:retire -- --document <id> --reason "superseded"
+```
+
+`--fake-embedder` uses hash-derived vectors (CI and machines without Ollama). Omit it to embed with the configured Ollama model. The API must use the same embedder: set `FAKE_MODELS=true` in `.env` when the corpus was published with `--fake-embedder`, otherwise `/ask` retrieves no passages.
+
+```bash
+pnpm eval:retrieval   # recall@5; generation metrics require a live Ollama run without --fake-embedder
+pnpm bench:ask        # stage timings against local Ollama; not CI-gated
+```
+
+Regenerate the fixture PDFs with `node data/generate-synthetic-pdfs.mjs`.
+
+### Local models
+
+Ollama is not started by `pnpm infra:up`. Pull models only when you need live embeddings or generation:
+
+```bash
+docker compose --profile models up -d
+```
+
+Confirm the chat tag with `ollama list`. Model identity is stored as a digest, not a tag.
+
+### Query log retention
+
+`AnswerLog` stores the query text, retrieval identifiers, model tags/digests, prompt/policy/retrieval/chunking versions, corpus revision, and stage timings. It does not store IP addresses or user agents. Rows older than `QUERY_LOG_RETENTION_DAYS` (default 30) are deleted by a daily worker job.

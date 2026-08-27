@@ -32,6 +32,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/rag/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/database/tsconfig.lib.json"
     },
     {

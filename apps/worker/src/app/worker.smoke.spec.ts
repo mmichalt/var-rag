@@ -1,5 +1,7 @@
 describe('worker smoke', () => {
-  const enabled = Boolean(process.env.DATABASE_URL && process.env.REDIS_URL);
+  const enabled = Boolean(
+    process.env.CI && process.env.DATABASE_URL && process.env.REDIS_URL,
+  );
 
   (enabled ? it : it.skip)(
     'starts an application context and shuts down cleanly',

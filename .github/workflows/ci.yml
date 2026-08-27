@@ -11,7 +11,6 @@ jobs:
     timeout-minutes: 45
     services: {}
     env:
-      NODE_ENV: test
       API_PORT: 3001
       DATABASE_URL: postgresql://football_rag:football_rag_dev@localhost:5432/football_rag
       REDIS_URL: redis://localhost:6379
@@ -19,6 +18,20 @@ jobs:
       LOG_LEVEL: error
       SWAGGER_ENABLED: 'false'
       NEXT_PUBLIC_API_BASE_URL: http://localhost:3001/api/v1
+      OLLAMA_BASE_URL: http://localhost:11434
+      EMBEDDING_MODEL: nomic-embed-text
+      EMBEDDING_DIMENSIONS: '768'
+      LLM_MODEL: llama3.2:3b
+      LLM_TEMPERATURE: '0'
+      LLM_SEED: '1'
+      LLM_NUM_CTX: '8192'
+      SEMANTIC_CANDIDATE_K: '40'
+      LEXICAL_CANDIDATE_K: '40'
+      RETRIEVAL_TOP_K: '8'
+      RETRIEVAL_MAX_COSINE_DISTANCE: '0.7'
+      ASK_RATE_LIMIT_PER_MINUTE: '20'
+      DIAGNOSTICS_ENABLED: 'false'
+      QUERY_LOG_RETENTION_DAYS: '30'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,6 +54,8 @@ jobs:
       - name: Run migrations
         run: pnpm db:migrate
       - name: Test
+        env:
+          NODE_ENV: test
         run: pnpm test
       - name: Build
         run: pnpm build

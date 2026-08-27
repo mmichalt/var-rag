@@ -10,5 +10,7 @@
 **/out-tsc
 pnpm-lock.yaml
 libs/database/src/generated
+*.pdf
+**/next-env.d.ts
 .corepack
 .tools
