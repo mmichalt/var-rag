@@ -82,19 +82,18 @@ export function applyPolicy(
       });
       continue;
     }
-    if (unit.type === 'quote') {
-      const ok = items.some((item) =>
-        normalizeForCompare(item.sourceText).includes(
-          normalizeForCompare(unit.text),
-        ),
-      );
-      if (!ok) {
-        rejections.push({
-          code: 'QUOTE_NOT_VERBATIM',
-          detail: `answerUnits[${i}] quote is not a substring of cited sourceText`,
-        });
-        continue;
-      }
+    const extractive = items.some((item) =>
+      normalizeForCompare(item.sourceText).includes(
+        normalizeForCompare(unit.text),
+      ),
+    );
+    if (!extractive) {
+      rejections.push({
+        code:
+          unit.type === 'quote' ? 'QUOTE_NOT_VERBATIM' : 'SUMMARY_NOT_GROUNDED',
+        detail: `answerUnits[${i}] ${unit.type} is not a substring of cited sourceText`,
+      });
+      continue;
     }
     const overCap = items.find(
       (item) => unit.text.length > item.maxExcerptChars,

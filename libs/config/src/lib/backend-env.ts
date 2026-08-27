@@ -30,6 +30,7 @@ const envSchema = z.object({
   SEMANTIC_CANDIDATE_K: z.coerce.number().int().positive(),
   LEXICAL_CANDIDATE_K: z.coerce.number().int().positive(),
   RETRIEVAL_TOP_K: z.coerce.number().int().positive(),
+  RETRIEVAL_MAX_COSINE_DISTANCE: z.coerce.number().min(0).max(2),
   ASK_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive(),
   DIAGNOSTICS_ENABLED: z.enum(['true', 'false']),
   QUERY_LOG_RETENTION_DAYS: z.coerce.number().int().positive(),
@@ -54,6 +55,7 @@ export type BackendConfig = {
   semanticCandidateK: number;
   lexicalCandidateK: number;
   retrievalTopK: number;
+  retrievalMaxCosineDistance: number;
   askRateLimitPerMinute: number;
   diagnosticsEnabled: boolean;
   queryLogRetentionDays: number;
@@ -186,6 +188,7 @@ export function parseBackendEnv(
     semanticCandidateK: raw.SEMANTIC_CANDIDATE_K,
     lexicalCandidateK: raw.LEXICAL_CANDIDATE_K,
     retrievalTopK: raw.RETRIEVAL_TOP_K,
+    retrievalMaxCosineDistance: raw.RETRIEVAL_MAX_COSINE_DISTANCE,
     askRateLimitPerMinute: raw.ASK_RATE_LIMIT_PER_MINUTE,
     diagnosticsEnabled: raw.DIAGNOSTICS_ENABLED === 'true',
     queryLogRetentionDays: raw.QUERY_LOG_RETENTION_DAYS,

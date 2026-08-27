@@ -18,6 +18,7 @@ const validEnv = {
   SEMANTIC_CANDIDATE_K: '40',
   LEXICAL_CANDIDATE_K: '40',
   RETRIEVAL_TOP_K: '8',
+  RETRIEVAL_MAX_COSINE_DISTANCE: '0.7',
   ASK_RATE_LIMIT_PER_MINUTE: '20',
   DIAGNOSTICS_ENABLED: 'false',
   QUERY_LOG_RETENTION_DAYS: '30',
@@ -35,6 +36,7 @@ describe('parseBackendEnv', () => {
     expect(config.ollamaBaseUrl).toBe('http://localhost:11434');
     expect(config.embeddingDimensions).toBe(768);
     expect(config.retrievalTopK).toBe(8);
+    expect(config.retrievalMaxCosineDistance).toBe(0.7);
     expect(config.diagnosticsEnabled).toBe(false);
     expect(config.queryLogRetentionDays).toBe(30);
     expect(config.fakeModels).toBe(false);

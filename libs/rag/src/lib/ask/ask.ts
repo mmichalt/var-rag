@@ -14,6 +14,7 @@ import {
   POLICY_VERSION,
   PROMPT_VERSION,
   RETRIEVAL_VERSION,
+  VISIBLE_FAMILY,
 } from '../versions.js';
 import { latestCorpusRevision } from '../corpus/fingerprint.js';
 import { capExcerpt, evidenceLabelText } from '../presentation.js';
@@ -94,6 +95,7 @@ async function publishedEditions(db: Db): Promise<PublishedEdition[]> {
       status: 'PUBLISHED',
       edition: { not: null },
       effectiveFrom: { not: null },
+      family: VISIBLE_FAMILY,
     },
     select: { edition: true, effectiveFrom: true, effectiveTo: true },
     distinct: ['edition'],
@@ -147,6 +149,7 @@ export async function askLaws(
       semanticCandidateK: input.config.semanticCandidateK,
       lexicalCandidateK: input.config.lexicalCandidateK,
       retrievalTopK: input.config.retrievalTopK,
+      retrievalMaxCosineDistance: input.config.retrievalMaxCosineDistance,
     },
     corpusRevision: corpus.revision,
     corpusFingerprint: corpus.fingerprint,

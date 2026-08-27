@@ -26,6 +26,7 @@ const testConfig: BackendConfig = {
   semanticCandidateK: 40,
   lexicalCandidateK: 40,
   retrievalTopK: 8,
+  retrievalMaxCosineDistance: 0.7,
   askRateLimitPerMinute: 20,
   diagnosticsEnabled: false,
   queryLogRetentionDays: 30,

@@ -1,7 +1,7 @@
 import { Prisma } from '@var-rag/database';
 import type { Db } from '../db.js';
 import { parseLocator } from '../locator.js';
-import { VISIBILITY_SQL } from '../versions.js';
+import { VISIBILITY_SQL, VISIBLE_FAMILY } from '../versions.js';
 import { capExcerpt, evidenceLabelText } from '../presentation.js';
 
 export type EvidenceRecord = {
@@ -94,6 +94,7 @@ export async function listLawEditions(db: Db) {
       status: 'PUBLISHED',
       edition: { not: null },
       effectiveFrom: { not: null },
+      family: VISIBLE_FAMILY,
     },
     select: {
       edition: true,

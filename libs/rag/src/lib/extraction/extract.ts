@@ -73,12 +73,14 @@ function extractPagesInChild(bytes: Uint8Array): PageExtract {
 }
 
 async function extractPages(bytes: Uint8Array): Promise<PageExtract> {
+  // pdf.js rejects Node Buffer even though it is a Uint8Array subclass.
+  const data = Buffer.isBuffer(bytes) ? new Uint8Array(bytes) : bytes;
   // ponytail: Jest's VM cannot dynamic-import unpdf/pdfjs. Spawn real Node
   // under Jest; drop this branch if tests run outside that VM.
   if (process.env.JEST_WORKER_ID) {
-    return extractPagesInChild(bytes);
+    return extractPagesInChild(data);
   }
-  const { text, totalPages } = await extractText(bytes, { mergePages: false });
+  const { text, totalPages } = await extractText(data, { mergePages: false });
   return { text: Array.isArray(text) ? text : [text], totalPages };
 }
 

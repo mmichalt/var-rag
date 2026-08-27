@@ -12,6 +12,7 @@ import { PrismaService } from '@var-rag/database';
 import {
   FakeAnswerGenerator,
   HashEmbedder,
+  buildChunkSet,
   ingestAndPublish,
 } from '@var-rag/rag';
 import request from 'supertest';
@@ -127,6 +128,53 @@ describeSlice('Ask the Laws slice', () => {
     expect(evidence.body.locator.lawNumber).toBeTruthy();
     expect(evidence.body.canonicalUrl).toBeTruthy();
     expect(documentId).toBeTruthy();
+  });
+
+  it('abstains when retrieved chunks are below the relevance cutoff', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/ask')
+      .send({
+        query: 'Who won the 2025 Premier League title?',
+        mode: 'laws',
+        edition: '2025/26',
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.kind).toBe('insufficient_evidence');
+  });
+
+  it('reuses an active chunk set on an identical rebuild', async () => {
+    const reused = await buildChunkSet(prisma, { documentId, embedder });
+    expect(reused.id).toBe(activeChunkSetId);
+    expect(reused.status).toBe('ACTIVE');
+  });
+
+  it('hides chunks when the source family is inactive', async () => {
+    const document = await prisma.sourceDocument.findUniqueOrThrow({
+      where: { id: documentId },
+    });
+    await prisma.sourceFamily.update({
+      where: { id: document.familyId },
+      data: { usageStatus: 'INACTIVE' },
+    });
+    try {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/ask')
+        .send({
+          query: 'When is a player penalised for handball?',
+          mode: 'laws',
+          edition: '2025/26',
+        });
+      expect(response.body.kind).toBe('insufficient_evidence');
+      const evidence = await request(app.getHttpServer()).get(
+        `/api/v1/evidence/${chunkId}`,
+      );
+      expect(evidence.status).toBe(410);
+    } finally {
+      await prisma.sourceFamily.update({
+        where: { id: document.familyId },
+        data: { usageStatus: 'ACTIVE' },
+      });
+    }
   });
 
   it('returns 410 without text for a retired document chunk', async () => {

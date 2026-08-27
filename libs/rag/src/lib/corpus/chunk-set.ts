@@ -34,13 +34,13 @@ export async function buildChunkSet(db: Db, input: BuildChunkSetInput) {
   const inProgress = await db.chunkSet.findFirst({
     where: {
       ...identity,
-      status: { in: ['BUILDING', 'READY'] },
+      status: { in: ['BUILDING', 'READY', 'ACTIVE'] },
     },
     orderBy: { createdAt: 'desc' },
   });
 
   let chunkSetId: string;
-  if (inProgress?.status === 'READY') {
+  if (inProgress?.status === 'READY' || inProgress?.status === 'ACTIVE') {
     return inProgress;
   }
 

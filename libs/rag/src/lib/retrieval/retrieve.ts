@@ -7,6 +7,21 @@ import { vectorLiteral } from '../embedding/write.js';
 import { RRF_K, VISIBILITY_SQL } from '../versions.js';
 import { rrfFuse } from './rrf.js';
 
+export function passesRelevanceCutoff(
+  chunk: {
+    lexicalRank: number | null;
+    cosineDistance: number | null;
+  },
+  maxCosineDistance: number,
+): boolean {
+  if (chunk.lexicalRank !== null) {
+    return true;
+  }
+  return (
+    chunk.cosineDistance !== null && chunk.cosineDistance <= maxCosineDistance
+  );
+}
+
 export type RetrievalFilters = {
   edition: string;
   embeddingModel: string;
@@ -83,6 +98,7 @@ export async function lexicalCandidates(
       FROM "Chunk" c
       INNER JOIN "SourceDocument" d ON d.id = c."documentId"
       INNER JOIN "ChunkSet" cs ON cs.id = c."chunkSetId"
+      INNER JOIN "SourceFamily" f ON f.id = d."familyId"
       WHERE ${Prisma.raw(VISIBILITY_SQL)}
         AND d.edition = ${filters.edition}
         AND cs."embeddingModel" = ${filters.embeddingModel}
@@ -121,7 +137,10 @@ export async function retrieveHybrid(
     filters: RetrievalFilters;
     config: Pick<
       BackendConfig,
-      'semanticCandidateK' | 'lexicalCandidateK' | 'retrievalTopK'
+      | 'semanticCandidateK'
+      | 'lexicalCandidateK'
+      | 'retrievalTopK'
+      | 'retrievalMaxCosineDistance'
     >;
   },
 ): Promise<{
@@ -149,11 +168,24 @@ export async function retrieveHybrid(
   const lexicalMs = Date.now() - lexicalStarted;
 
   const fusionStarted = Date.now();
+  const semanticDistance = new Map(
+    semantic.map((row) => [row.id, row.distance]),
+  );
   const fused = rrfFuse(
     semantic.map((row, index) => ({ id: row.id, rank: index + 1 })),
     lexical.map((row, index) => ({ id: row.id, rank: index + 1 })),
     RRF_K,
-  ).slice(0, input.config.retrievalTopK);
+  )
+    .filter((hit) =>
+      passesRelevanceCutoff(
+        {
+          lexicalRank: hit.lexicalRank,
+          cosineDistance: semanticDistance.get(hit.id) ?? null,
+        },
+        input.config.retrievalMaxCosineDistance,
+      ),
+    )
+    .slice(0, input.config.retrievalTopK);
   const fusionMs = Date.now() - fusionStarted;
 
   if (fused.length === 0) {
@@ -172,9 +204,6 @@ export async function retrieveHybrid(
       AND c.id IN (${Prisma.join(ids)})
   `);
   const byId = new Map(hydrated.map((row) => [row.id, row]));
-  const semanticDistance = new Map(
-    semantic.map((row) => [row.id, row.distance]),
-  );
   const lexicalRankScore = new Map(lexical.map((row) => [row.id, row.rank]));
 
   const chunks: RetrievedChunk[] = [];

@@ -1,6 +1,6 @@
 export const PROMPT_VERSION = 'laws-ask-v1';
-export const POLICY_VERSION = 'laws-policy-v1';
-export const RETRIEVAL_VERSION = 'hybrid-rrf-v1';
+export const POLICY_VERSION = 'laws-policy-v2';
+export const RETRIEVAL_VERSION = 'hybrid-rrf-v2';
 export const CHUNKING_VERSION = 'law-heading-v2';
 export const NORMALIZATION_VERSION = 'dehyphen-ligature-v1';
 export const RRF_K = 60;
@@ -17,7 +17,12 @@ export const FAKE_LLM_DIGEST = 'sha256:fake-generator-v1';
 export const CLI_ACTOR = 'cli:operator';
 export const CLI_ACTOR_TRUST = 'UNAUTHENTICATED' as const;
 
-export const VISIBILITY_SQL = `d.status = 'PUBLISHED' AND c."chunkSetId" = d."activeChunkSetId"`;
+export const VISIBILITY_SQL = `d.status = 'PUBLISHED' AND c."chunkSetId" = d."activeChunkSetId" AND f."rightsStatus" = 'APPROVED' AND f."usageStatus" = 'ACTIVE'`;
+
+export const VISIBLE_FAMILY = {
+  rightsStatus: 'APPROVED',
+  usageStatus: 'ACTIVE',
+} as const;
 
 export const EXPECTED_LAW_NUMBERS = [
   '1',

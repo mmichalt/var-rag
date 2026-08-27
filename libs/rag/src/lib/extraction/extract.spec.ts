@@ -12,7 +12,7 @@ describe('extractPdf', () => {
     'extracts law headings from the synthetic fixture',
     async () => {
       const bytes = readFileSync(pdfPath as string);
-      const extracted = await extractPdf(new Uint8Array(bytes));
+      const extracted = await extractPdf(bytes);
       expect(extracted.pages.length).toBe(7);
       expect(extracted.gatePassed).toBe(true);
       expect(extracted.report.detectedLaws).toEqual(

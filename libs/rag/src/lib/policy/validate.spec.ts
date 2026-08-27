@@ -91,7 +91,53 @@ describe('applyPolicy', () => {
     expect(result.answerUnits).toHaveLength(1);
   });
 
+  it('accepts an extractive summary from sourceText', () => {
+    const result = applyPolicy(
+      schemaOk({
+        outcome: 'answer',
+        answerUnits: [
+          {
+            text: 'A player is penalised for handball',
+            type: 'summary',
+            citations: ['E1'],
+          },
+        ],
+      }),
+      evidence,
+    );
+    expect(result.outcome).toBe('answer');
+  });
+
+  it('rejects a summary that is not supported by cited passages', () => {
+    const result = applyPolicy(
+      schemaOk({
+        outcome: 'answer',
+        answerUnits: [
+          {
+            text: 'Law 99 is the only law',
+            type: 'summary',
+            citations: ['E1'],
+          },
+        ],
+      }),
+      evidence,
+    );
+    expect(result.rejections.map((r) => r.code)).toContain(
+      'SUMMARY_NOT_GROUNDED',
+    );
+    expect(result.outcome).toBe('insufficient_evidence');
+  });
+
   it('rejects verdict language without an official finding', () => {
+    const findingEvidence: PresentedEvidence[] = [
+      {
+        label: 'Official law',
+        chunkId: 'c1',
+        sourceText: 'The referee was wrong to give a penalty.',
+        evidenceLabel: 'OFFICIAL_LAW',
+        maxExcerptChars: 400,
+      },
+    ];
     const result = applyPolicy(
       schemaOk({
         outcome: 'answer',
@@ -103,7 +149,7 @@ describe('applyPolicy', () => {
           },
         ],
       }),
-      evidence,
+      findingEvidence,
     );
     expect(result.rejections.map((r) => r.code)).toContain(
       'VERDICT_WITHOUT_FINDING',

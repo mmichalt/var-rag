@@ -215,6 +215,7 @@ LLM_NUM_CTX=8192
 SEMANTIC_CANDIDATE_K=40
 LEXICAL_CANDIDATE_K=40
 RETRIEVAL_TOP_K=8
+RETRIEVAL_MAX_COSINE_DISTANCE=0.7
 ASK_RATE_LIMIT_PER_MINUTE=20
 DIAGNOSTICS_ENABLED=false
 QUERY_LOG_RETENTION_DAYS=30
@@ -250,12 +251,15 @@ One backend library tagged `type:lib, scope:backend` so the existing `@nx/enforc
 ```text
 resolve edition -> embed query -> SEMANTIC_CANDIDATE_K by cosine distance
                               -> LEXICAL_CANDIDATE_K by websearch_to_tsquery
-                              -> RRF fusion with RRF_K -> cut to RETRIEVAL_TOP_K
+                              -> RRF fusion with RRF_K
+                              -> drop hits with no lexical support and cosine
+                                 distance above RETRIEVAL_MAX_COSINE_DISTANCE
+                              -> cut to RETRIEVAL_TOP_K
 ```
 
 Candidate depth is deliberately much larger than the returned set; fusing two top-8 lists would discard most of the benefit of hybrid retrieval.
 
-Filters applied in SQL: the visibility rule, the resolved edition, **and the active embedding model, digest and dimensions**. Embeddings produced by different models must never be compared in one vector space, even at identical dimensionality.
+Filters applied in SQL: the visibility rule (published active chunk set, approved active family), the resolved edition, **and the active embedding model, digest and dimensions**. Embeddings produced by different models must never be compared in one vector space, even at identical dimensionality.
 
 ### 6.2 Generation contract
 
@@ -281,7 +285,7 @@ Deterministic, no model involvement. Each failure strips the offending unit or a
 1. Schema violation or unparseable output.
 2. An answer unit with zero citations (NFR-001).
 3. A citation that does not resolve to a presented evidence label, such as `E99`.
-4. A `quote` unit that is not a verbatim substring of its cited chunk's `sourceText` after normalization.
+4. A `quote` or `summary` unit that is not a verbatim substring of a cited chunk's `sourceText` after normalization.
 5. Verdict language without a cited official finding (FR-029, FR-030).
 6. Excerpt length above the family's `maxExcerptChars` (NFR-020).
 
