@@ -5,7 +5,9 @@ import { loadBackendConfig } from '@var-rag/config';
 import { configureHttpApp } from '../http';
 
 describe('API readiness', () => {
-  const enabled = Boolean(process.env.DATABASE_URL && process.env.REDIS_URL);
+  const enabled = Boolean(
+    process.env.CI && process.env.DATABASE_URL && process.env.REDIS_URL,
+  );
 
   (enabled ? it : it.skip)(
     'reports ready when PostgreSQL and Redis are available',

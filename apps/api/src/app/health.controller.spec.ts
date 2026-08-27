@@ -16,6 +16,20 @@ const testConfig: BackendConfig = {
   corsOrigins: ['http://localhost:3000'],
   logLevel: 'error',
   swaggerEnabled: false,
+  ollamaBaseUrl: 'http://localhost:11434',
+  embeddingModel: 'nomic-embed-text',
+  embeddingDimensions: 768,
+  llmModel: 'llama3.2:3b',
+  llmTemperature: 0,
+  llmSeed: 1,
+  llmNumCtx: 8192,
+  semanticCandidateK: 40,
+  lexicalCandidateK: 40,
+  retrievalTopK: 8,
+  askRateLimitPerMinute: 20,
+  diagnosticsEnabled: false,
+  queryLogRetentionDays: 30,
+  fakeModels: false,
 };
 
 describe('HealthController', () => {

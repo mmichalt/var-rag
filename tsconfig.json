@@ -13,6 +13,9 @@
       "path": "./libs/database"
     },
     {
+      "path": "./libs/rag"
+    },
+    {
       "path": "./apps/api"
     },
     {

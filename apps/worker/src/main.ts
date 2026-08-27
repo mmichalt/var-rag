@@ -23,6 +23,12 @@ function createJsonLogger(
 }
 
 async function bootstrap(): Promise<void> {
+  const command = process.argv[2];
+  if (command && !command.startsWith('-')) {
+    const { runCli } = await import('./cli');
+    await runCli(process.argv.slice(2));
+    return;
+  }
   const config = loadBackendConfig();
   const app = await NestFactory.createApplicationContext(WorkerModule, {
     logger: createJsonLogger(config.logLevel),

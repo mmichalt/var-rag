@@ -19,12 +19,19 @@
     "db:migrate": "nx build database && node libs/database/dist/lib/run-migrations.js",
     "db:migration:create": "pnpm --filter @var-rag/database exec prisma migrate dev --create-only --config prisma.config.ts",
     "db:migration:generate": "pnpm --filter @var-rag/database exec prisma migrate dev --config prisma.config.ts",
+    "corpus:ingest": "nx build worker && node apps/worker/dist/main.js ingest",
+    "corpus:inspect": "nx build worker && node apps/worker/dist/main.js inspect",
+    "corpus:publish": "nx build worker && node apps/worker/dist/main.js publish",
+    "corpus:retire": "nx build worker && node apps/worker/dist/main.js retire",
+    "corpus:reindex": "nx build worker && node apps/worker/dist/main.js reindex",
+    "eval:retrieval": "nx build worker && node apps/worker/dist/main.js eval --fake-embedder",
+    "bench:ask": "nx build worker && node apps/worker/dist/main.js bench-ask",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "nx run-many -t lint",
     "typecheck": "nx run-many -t typecheck",
     "test": "nx run-many -t test",
-    "build": "nx run-many -t build"
+    "build": "NODE_ENV=production nx run-many -t build"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

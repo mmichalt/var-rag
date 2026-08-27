@@ -70,13 +70,41 @@ services:
         mc alias set local http://minio:9000 football_rag football_rag_dev
         mc mb --ignore-existing local/football-rag-sources
 
+  ollama:
+    image: ollama/ollama:0.11.10
+    container_name: football-rag-ollama
+    profiles: ['models']
+    restart: unless-stopped
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ['CMD-SHELL', 'ollama list || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  ollama-pull:
+    image: ollama/ollama:0.11.10
+    profiles: ['models']
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ['/bin/sh', '-c']
+    command: ollama pull nomic-embed-text && ollama pull llama3.2:3b
+
   migrate:
     build:
       context: .
       dockerfile: docker/api.Dockerfile
     profiles: ['app']
     command: ['node', 'libs/database/dist/lib/run-migrations.js']
-    environment:
+    environment: &backend-env
       NODE_ENV: production
       API_PORT: 3001
       DATABASE_URL: postgresql://football_rag:football_rag_dev@postgres:5432/football_rag
@@ -84,6 +112,19 @@ services:
       CORS_ORIGINS: http://localhost:3000
       LOG_LEVEL: info
       SWAGGER_ENABLED: 'false'
+      OLLAMA_BASE_URL: http://ollama:11434
+      EMBEDDING_MODEL: nomic-embed-text
+      EMBEDDING_DIMENSIONS: 768
+      LLM_MODEL: llama3.2:3b
+      LLM_TEMPERATURE: 0
+      LLM_SEED: 1
+      LLM_NUM_CTX: 8192
+      SEMANTIC_CANDIDATE_K: 40
+      LEXICAL_CANDIDATE_K: 40
+      RETRIEVAL_TOP_K: 8
+      ASK_RATE_LIMIT_PER_MINUTE: 20
+      DIAGNOSTICS_ENABLED: 'false'
+      QUERY_LOG_RETENTION_DAYS: 30
     depends_on:
       postgres:
         condition: service_healthy
@@ -96,13 +137,7 @@ services:
       dockerfile: docker/api.Dockerfile
     profiles: ['app']
     environment:
-      NODE_ENV: production
-      API_PORT: 3001
-      DATABASE_URL: postgresql://football_rag:football_rag_dev@postgres:5432/football_rag
-      REDIS_URL: redis://redis:6379
-      CORS_ORIGINS: http://localhost:3000
-      LOG_LEVEL: info
-      SWAGGER_ENABLED: 'false'
+      <<: *backend-env
     ports:
       - '3001:3001'
     depends_on:
@@ -131,12 +166,7 @@ services:
       dockerfile: docker/worker.Dockerfile
     profiles: ['app']
     environment:
-      NODE_ENV: production
-      API_PORT: 3001
-      DATABASE_URL: postgresql://football_rag:football_rag_dev@postgres:5432/football_rag
-      REDIS_URL: redis://redis:6379
-      CORS_ORIGINS: http://localhost:3000
-      LOG_LEVEL: info
+      <<: *backend-env
     depends_on:
       postgres:
         condition: service_healthy
@@ -163,3 +193,4 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
+  ollama_data:

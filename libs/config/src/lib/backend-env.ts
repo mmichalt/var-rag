@@ -20,6 +20,20 @@ const envSchema = z.object({
   S3_SECRET_KEY: z.string().optional(),
   S3_BUCKET: z.string().optional(),
   S3_FORCE_PATH_STYLE: z.enum(['true', 'false']).optional(),
+  OLLAMA_BASE_URL: z.string().min(1, 'OLLAMA_BASE_URL is required'),
+  EMBEDDING_MODEL: z.string().min(1, 'EMBEDDING_MODEL is required'),
+  EMBEDDING_DIMENSIONS: z.coerce.number().int().positive(),
+  LLM_MODEL: z.string().min(1, 'LLM_MODEL is required'),
+  LLM_TEMPERATURE: z.coerce.number(),
+  LLM_SEED: z.coerce.number().int(),
+  LLM_NUM_CTX: z.coerce.number().int().positive(),
+  SEMANTIC_CANDIDATE_K: z.coerce.number().int().positive(),
+  LEXICAL_CANDIDATE_K: z.coerce.number().int().positive(),
+  RETRIEVAL_TOP_K: z.coerce.number().int().positive(),
+  ASK_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive(),
+  DIAGNOSTICS_ENABLED: z.enum(['true', 'false']),
+  QUERY_LOG_RETENTION_DAYS: z.coerce.number().int().positive(),
+  FAKE_MODELS: z.enum(['true', 'false']).optional(),
 });
 
 export type BackendConfig = {
@@ -30,6 +44,20 @@ export type BackendConfig = {
   corsOrigins: string[];
   logLevel: (typeof logLevels)[number];
   swaggerEnabled: boolean;
+  ollamaBaseUrl: string;
+  embeddingModel: string;
+  embeddingDimensions: number;
+  llmModel: string;
+  llmTemperature: number;
+  llmSeed: number;
+  llmNumCtx: number;
+  semanticCandidateK: number;
+  lexicalCandidateK: number;
+  retrievalTopK: number;
+  askRateLimitPerMinute: number;
+  diagnosticsEnabled: boolean;
+  queryLogRetentionDays: number;
+  fakeModels: boolean;
   s3?: {
     endpoint: string;
     region: string;
@@ -64,6 +92,13 @@ function assertRedisUrl(urlString: string): void {
   }
 }
 
+function assertOllamaUrl(urlString: string): void {
+  const url = protocolOf(urlString, 'OLLAMA_BASE_URL');
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('OLLAMA_BASE_URL must use http:// or https://');
+  }
+}
+
 export function redisConnectionOptions(redisUrl: string): {
   host: string;
   port: number;
@@ -95,6 +130,13 @@ export function parseBackendEnv(
   const raw = parsed.data;
   assertPostgresUrl(raw.DATABASE_URL);
   assertRedisUrl(raw.REDIS_URL);
+  assertOllamaUrl(raw.OLLAMA_BASE_URL);
+
+  if (raw.EMBEDDING_DIMENSIONS !== 768) {
+    throw new Error(
+      'EMBEDDING_DIMENSIONS must be 768 (Chunk.embedding column width)',
+    );
+  }
 
   const corsOrigins = raw.CORS_ORIGINS.split(',')
     .map((origin) => origin.trim())
@@ -134,6 +176,20 @@ export function parseBackendEnv(
     corsOrigins,
     logLevel: raw.LOG_LEVEL,
     swaggerEnabled,
+    ollamaBaseUrl: raw.OLLAMA_BASE_URL.replace(/\/+$/, ''),
+    embeddingModel: raw.EMBEDDING_MODEL,
+    embeddingDimensions: raw.EMBEDDING_DIMENSIONS,
+    llmModel: raw.LLM_MODEL,
+    llmTemperature: raw.LLM_TEMPERATURE,
+    llmSeed: raw.LLM_SEED,
+    llmNumCtx: raw.LLM_NUM_CTX,
+    semanticCandidateK: raw.SEMANTIC_CANDIDATE_K,
+    lexicalCandidateK: raw.LEXICAL_CANDIDATE_K,
+    retrievalTopK: raw.RETRIEVAL_TOP_K,
+    askRateLimitPerMinute: raw.ASK_RATE_LIMIT_PER_MINUTE,
+    diagnosticsEnabled: raw.DIAGNOSTICS_ENABLED === 'true',
+    queryLogRetentionDays: raw.QUERY_LOG_RETENTION_DAYS,
+    fakeModels: raw.FAKE_MODELS === 'true',
     s3,
   };
 }

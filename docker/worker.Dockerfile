@@ -13,11 +13,12 @@ COPY apps/api/package.json apps/api/package.json
 COPY apps/worker/package.json apps/worker/package.json
 COPY libs/config/package.json libs/config/package.json
 COPY libs/database/package.json libs/database/package.json
+COPY libs/rag/package.json libs/rag/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY . .
-RUN pnpm exec nx build worker && pnpm exec nx build config && pnpm exec nx build database
+RUN pnpm exec nx build worker && pnpm exec nx build config && pnpm exec nx build database && pnpm exec nx build rag
 
 FROM node:24.19.0-bookworm-slim AS runner
 ENV NODE_ENV=production
@@ -30,6 +31,8 @@ COPY --from=build --chown=appuser:appuser /app/libs/config/dist ./libs/config/di
 COPY --from=build --chown=appuser:appuser /app/libs/config/package.json ./libs/config/package.json
 COPY --from=build --chown=appuser:appuser /app/libs/database/dist ./libs/database/dist
 COPY --from=build --chown=appuser:appuser /app/libs/database/package.json ./libs/database/package.json
+COPY --from=build --chown=appuser:appuser /app/libs/rag/dist ./libs/rag/dist
+COPY --from=build --chown=appuser:appuser /app/libs/rag/package.json ./libs/rag/package.json
 COPY --from=build --chown=appuser:appuser /app/package.json ./package.json
 COPY --from=build --chown=appuser:appuser /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 USER appuser

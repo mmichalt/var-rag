@@ -1,0 +1,150 @@
+{
+  "title": "Synthetic Association Football Lawbook",
+  "expectedLawNumbers": ["1", "2", "5", "11", "12", "13", "14"],
+  "editions": {
+    "2025/26": {
+      "edition": "2025/26",
+      "effectiveFrom": "2025-07-01",
+      "effectiveTo": "2026-06-30",
+      "canonicalUrl": "https://example.invalid/lawbook/2025-26",
+      "laws": [
+        {
+          "number": "1",
+          "title": "The Field of Play",
+          "sections": [
+            {
+              "heading": "Dimensions",
+              "paragraphs": [
+                "The field of play is a rectangle. The length of the touch line must be greater than the length of the goal line.",
+                "For adult matches the touch line is between 90 metres and 120 metres. The goal line is between 45 metres and 90 metres."
+              ]
+            },
+            {
+              "heading": "The Penalty Area",
+              "paragraphs": [
+                "Two lines are drawn at right angles to the goal line, 16.5 metres from the inside of each goalpost. These lines extend 16.5 metres into the field of play and are joined by a line drawn parallel with the goal line. The area bounded by these lines and the goal line is the penalty area."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "2",
+          "title": "The Ball",
+          "sections": [
+            {
+              "heading": "Qualities and Measurements",
+              "paragraphs": [
+                "The ball is spherical, made of a suitable material, of a circumference between 68 centimetres and 70 centimetres, and of a weight between 410 grams and 450 grams at the start of the match."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "5",
+          "title": "The Referee",
+          "sections": [
+            {
+              "heading": "Authority",
+              "paragraphs": [
+                "Each match is controlled by a referee who has full authority to enforce the Laws of the Game in connection with the match.",
+                "The referee's decision on facts connected with play, including whether a goal is scored and the result of the match, is final. The referee may not change a restart decision when play has restarted or the referee has signalled the end of the first or second half."
+              ]
+            },
+            {
+              "heading": "Duties",
+              "paragraphs": [
+                "The referee enforces the Laws of the Game, controls the match in cooperation with other match officials, and acts as timekeeper, keeping a record of the match."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "11",
+          "title": "Offside",
+          "sections": [
+            {
+              "heading": "Offside Position",
+              "paragraphs": [
+                "A player is in an offside position if any part of the head, body or feet is nearer to the opponents' goal line than both the ball and the second-last opponent. The hands and arms of all players, including the goalkeepers, are not considered.",
+                "A player is not in an offside position if the player is level with the second-last opponent or the last two opponents, or is level with or behind the ball."
+              ]
+            },
+            {
+              "heading": "Offside Offence",
+              "paragraphs": [
+                "A player in an offside position at the moment the ball is played or touched by a team-mate is only penalised on becoming involved in active play by interfering with play, interfering with an opponent, or gaining an advantage by playing the ball or interfering with an opponent.",
+                "There is no offside offence if a player receives the ball directly from a goal kick, a throw-in, or a corner kick."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "12",
+          "title": "Fouls and Misconduct",
+          "sections": [
+            {
+              "heading": "Direct Free Kick",
+              "paragraphs": [
+                "A direct free kick is awarded if a player commits any of the following offences against an opponent in a manner considered by the referee to be careless, reckless or using excessive force: charges, jumps at, kicks or attempts to kick, pushes, strikes or attempts to strike, tackles or challenges, or trips or attempts to trip."
+              ]
+            },
+            {
+              "heading": "Handball",
+              "paragraphs": [
+                "A player is penalised for handball if they deliberately touch the ball with their hand or arm, or if they make their body unnaturally bigger and the ball strikes that arm.",
+                "It is not usually an offence if the ball touches a player's hand or arm directly from their own head or body and the player has not made their body unnaturally bigger."
+              ]
+            },
+            {
+              "heading": "Denial of a Goal or an Obvious Goal-Scoring Opportunity",
+              "paragraphs": [
+                "Where a player denies the opposing team a goal or an obvious goal-scoring opportunity by a handball offence, the player is sent off wherever the offence occurs.",
+                "Where a player commits an offence against an opponent within their own penalty area which denies an obvious goal-scoring opportunity and the referee awards a penalty kick, the offender is cautioned if the offence was an attempt to play the ball. In all other circumstances, including holding, pulling, pushing, or not attempting to play the ball, the offending player is sent off."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "13",
+          "title": "Free Kicks",
+          "sections": [
+            {
+              "heading": "Types of Free Kick",
+              "paragraphs": [
+                "Direct and indirect free kicks are awarded to the opposing team of a player guilty of an offence. For a direct free kick the ball may be kicked directly into the opponents' goal. For an indirect free kick a goal may be scored only if another player touches the ball before it enters the goal."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "14",
+          "title": "The Penalty Kick",
+          "sections": [
+            {
+              "heading": "Procedure",
+              "paragraphs": [
+                "A penalty kick is awarded if a player commits a direct free kick offence inside their own penalty area or off the field as part of play as described in Law 12.",
+                "The ball must be stationary on the penalty mark. The defending goalkeeper must remain on the goal line, facing the kicker, between the goalposts, until the ball has been kicked. The players other than the kicker and goalkeeper must be at least 9.15 metres from the penalty mark, behind the penalty mark, and inside the field of play."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "2026/27": {
+      "edition": "2026/27",
+      "effectiveFrom": "2026-07-01",
+      "effectiveTo": null,
+      "canonicalUrl": "https://example.invalid/lawbook/2026-27",
+      "basedOn": "2025/26",
+      "reword": {
+        "lawNumber": "12",
+        "section": "Handball",
+        "paragraphs": [
+          "A player is penalised for handball only if they deliberately touch the ball with their hand or arm. Making the body unnaturally bigger is not, by itself, an offence unless the arm is also clearly away from the torso when the ball strikes it.",
+          "It is not usually an offence if the ball touches a player's hand or arm directly from their own head or body, including when the arm is close to the torso."
+        ]
+      }
+    }
+  }
+}

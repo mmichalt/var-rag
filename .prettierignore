@@ -10,5 +10,6 @@
 **/out-tsc
 pnpm-lock.yaml
 libs/database/src/generated
+*.pdf
 .corepack
 .tools
