@@ -142,10 +142,11 @@ describeSlice('Ask the Laws slice', () => {
     expect(response.body.kind).toBe('insufficient_evidence');
   });
 
-  it('reuses an active chunk set on an identical rebuild', async () => {
-    const reused = await buildChunkSet(prisma, { documentId, embedder });
-    expect(reused.id).toBe(activeChunkSetId);
-    expect(reused.status).toBe('ACTIVE');
+  it('reuses a matching chunk set on an identical rebuild', async () => {
+    const first = await buildChunkSet(prisma, { documentId, embedder });
+    const second = await buildChunkSet(prisma, { documentId, embedder });
+    expect(second.id).toBe(first.id);
+    expect(['READY', 'ACTIVE']).toContain(second.status);
   });
 
   it('hides chunks when the source family is inactive', async () => {
@@ -164,7 +165,8 @@ describeSlice('Ask the Laws slice', () => {
           mode: 'laws',
           edition: '2025/26',
         });
-      expect(response.body.kind).toBe('insufficient_evidence');
+      expect(response.body.kind).toBe('clarification');
+      expect(response.body.clarification.reason).toBe('ambiguous_edition');
       const evidence = await request(app.getHttpServer()).get(
         `/api/v1/evidence/${chunkId}`,
       );

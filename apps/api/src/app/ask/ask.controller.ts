@@ -1,4 +1,11 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  HttpCode,
+} from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOkResponse,
@@ -35,6 +42,7 @@ export class AskController {
   constructor(private readonly askService: AskService) {}
 
   @Post()
+  @HttpCode(200)
   @ApiOperation({ summary: 'Ask a football law question' })
   @ApiOkResponse({
     schema: {
